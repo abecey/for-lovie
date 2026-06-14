@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Celebration</title>
+    <link rel="stylesheet" href="design.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <h1 class="logo">Jamskii Special Day 🐻</h1>
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+                    <li><a href="#photobooth" class="nav-link" data-page="photobooth">Photo Booth</a></li>
+                    <li><a href="#love-notes" class="nav-link" data-page="love-notes">Love Notes</a></li>
+                    <li><a href="#special-moments" class="nav-link" data-page="special-moments">Our Moments</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <div class="confetti"></div>
+                <h2 class="title">🤍 Happy Birthday, My Love 🤍</h2>
+                <p class="subtitle">A special page just for youu...</p>
+                
+                <div class="home-grid">
+                    <div class="home-card" onclick="navigateTo('photobooth')">
+                        <div class="card-icon">📸</div>
+                        <h3>Photo Booth</h3>
+                        <p>Upload our beautiful memories together</p>
+                    </div>
+                    
+                    <div class="home-card" onclick="navigateTo('love-notes')">
+                        <div class="card-icon">💌</div>
+                        <h3>Love Notes</h3>
+                        <p>Express your feelings and love</p>
+                    </div>
+                    
+                    <div class="home-card" onclick="navigateTo('special-moments')">
+                        <div class="card-icon">✨</div>
+                        <h3>Our Moments</h3>
+                        <p>View all our beautiful memories</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Booth Page -->
+        <section id="photobooth" class="page">
+            <div class="section-content">
+                <h2>📸 Memory Booth</h2>
+                <p class="section-subtitle">Upload photos that look like they're from a photo booth</p>
+                
+                <div class="photo-booth">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📷</div>
+                        <h3>Drop Photos Here</h3>
+                        <p>or click to select files</p>
+                        <input type="file" id="photoInput" multiple accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="photobooth-frames">
+                        <h3>Photo Booth Frames</h3>
+                        <div class="frame-options">
+                            <button class="frame-btn active" data-frame="single" onclick="selectFrame('single')">Single</button>
+                            <button class="frame-btn" data-frame="double" onclick="selectFrame('double')">Double</button>
+                            <button class="frame-btn" data-frame="quad" onclick="selectFrame('quad')">Quad (4x)</button>
+                            <button class="frame-btn" data-frame="strip" onclick="selectFrame('strip')">Strip</button>
+                        </div>
+                    </div>
+
+                    <!-- Editable Frame Section with Delete Buttons -->
+                    <div class="frame-section">
+                        <h3>Edit Your Frame</h3>
+                        <div id="photoGallery" class="photo-gallery"></div>
+                    </div>
+
+                    <!-- Final Frame Section (No Delete Buttons) -->
+                    <div class="final-frame-section">
+                        <h3>Your Final Photo Booth Frame</h3>
+                        <div id="finalFrameGallery" class="photo-gallery final-frame"></div>
+                        <div class="save-button-container">
+                            <button id="savePhotoBoothBtn" class="btn btn-save" onclick="savePhotoBoothFrame()">💾 Save Photo Booth Frame</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Love Notes Page -->
+        <section id="love-notes" class="page">
+            <div class="section-content">
+                <h2>💌 Love Notes</h2>
+                <p class="section-subtitle">Love of wisdom</p>
+                
+                <div class="love-notes-container">
+                    <form id="loveNoteForm" class="love-note-form">
+                        <div class="form-group">
+                            <label for="noteText">Your Love Note:</label>
+                            <textarea id="noteText" required placeholder="... 🤍" rows="8"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Love Note</button>
+                    </form>
+
+                    <div class="notes-display">
+                        <h3>🤍 Message for u 🤍</h3>
+                        <div id="notesList" class="notes-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Special Moments Page -->
+        <section id="special-moments" class="page">
+            <div class="section-content">
+                <h2>✨ Our Special Moments</h2>
+                <p class="section-subtitle">A collection of our beautiful memories</p>
+                
+                <div class="moments-container">
+                    <div id="momentsGallery" class="moments-gallery"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Hidden canvas for saving frames -->
+    <canvas id="captureCanvas" style="display: none;"></canvas>
+
+    <button id="backBtn" class="back-btn" style="display: none;" onclick="navigateTo('home')">← Back</button>
+
+    <script src="birhtday.js"></script>
+</body>
+</html>
