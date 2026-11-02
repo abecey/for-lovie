@@ -77,13 +77,11 @@ function handlePhotos(files) {
                 photoBuffer.push(imageData);
                 displayPhotos();
                 displayMoments();
+                persistPhotoState();
             };
             reader.readAsDataURL(file);
         }
     });
-    
-    // Save to localStorage
-    localStorage.setItem('photoBoothPhotos', JSON.stringify(photoBuffer));
 }
 
 function selectFrame(frame) {
@@ -214,7 +212,7 @@ function displayPhotos() {
 
 function deletePhoto(index) {
     photoBuffer.splice(index, 1);
-    localStorage.setItem('photoBoothPhotos', JSON.stringify(photoBuffer));
+    persistPhotoState();
     displayPhotos();
     displayMoments();
 }
@@ -233,6 +231,103 @@ function displayMoments() {
         momentItem.innerHTML = `<img src="${photo}" alt="moment">`;
         momentsGallery.appendChild(momentItem);
     });
+}
+
+// ============= CLOUD SYNC FOR PERMANENT DATA =============
+// To enable syncing across devices, add these before this script in your HTML:
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+// <script>
+//   window.SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+//   window.SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+// </script>
+
+let supabaseClient = null;
+
+function initSupabaseClient() {
+    const url = window.SUPABASE_URL || '';
+    const key = window.SUPABASE_ANON_KEY || '';
+
+    if (!url || !key || !window.supabase) {
+        return null;
+    }
+
+    return window.supabase.createClient(url, key);
+}
+
+supabaseClient = initSupabaseClient();
+
+async function saveCloudValue(key, value) {
+    if (!supabaseClient) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('app_data')
+            .upsert({ key, value: JSON.stringify(value) }, { onConflict: 'key' });
+
+        if (error) {
+            console.warn('Cloud sync failed:', error.message);
+        }
+    } catch (error) {
+        console.warn('Cloud sync failed:', error);
+    }
+}
+
+async function loadCloudValue(key, fallbackValue) {
+    if (!supabaseClient) return fallbackValue;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('app_data')
+            .select('value')
+            .eq('key', key)
+            .maybeSingle();
+
+        if (error) {
+            console.warn('Cloud load failed:', error.message);
+            return fallbackValue;
+        }
+
+        if (!data || !data.value) {
+            return fallbackValue;
+        }
+
+        return JSON.parse(data.value);
+    } catch (error) {
+        console.warn('Cloud load failed:', error);
+        return fallbackValue;
+    }
+}
+
+async function persistPhotoState() {
+    localStorage.setItem('photoBoothPhotos', JSON.stringify(photoBuffer));
+    await saveCloudValue('photoBoothPhotos', photoBuffer);
+}
+
+async function persistLoveNoteState() {
+    localStorage.setItem('loveNotes', JSON.stringify(loveNotes));
+    await saveCloudValue('loveNotes', loveNotes);
+}
+
+async function loadSavedPhotoState() {
+    const localPhotos = localStorage.getItem('photoBoothPhotos');
+    const cloudPhotos = await loadCloudValue('photoBoothPhotos', localPhotos ? JSON.parse(localPhotos) : []);
+
+    if (Array.isArray(cloudPhotos) && cloudPhotos.length) {
+        photoBuffer = cloudPhotos;
+    } else if (localPhotos) {
+        photoBuffer = JSON.parse(localPhotos);
+    }
+}
+
+async function loadSavedLoveNotes() {
+    const localNotes = localStorage.getItem('loveNotes');
+    const cloudNotes = await loadCloudValue('loveNotes', localNotes ? JSON.parse(localNotes) : []);
+
+    if (Array.isArray(cloudNotes) && cloudNotes.length) {
+        loveNotes = cloudNotes;
+    } else if (localNotes) {
+        loveNotes = JSON.parse(localNotes);
+    }
 }
 
 // ============= SAVE PHOTO BOOTH FRAME =============
@@ -345,7 +440,7 @@ let loveNotes = JSON.parse(localStorage.getItem('loveNotes')) || [];
 const loveNoteForm = document.getElementById('loveNoteForm');
 const notesList = document.getElementById('notesList');
 
-loveNoteForm.addEventListener('submit', (e) => {
+loveNoteForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const note = {
@@ -354,7 +449,7 @@ loveNoteForm.addEventListener('submit', (e) => {
     };
     
     loveNotes.unshift(note);
-    localStorage.setItem('loveNotes', JSON.stringify(loveNotes));
+    await persistLoveNoteState();
     
     loveNoteForm.reset();
     displayLoveNotes();
@@ -395,14 +490,11 @@ function escapeHtml(text) {
 }
 
 // ============= INITIALIZATION =============
-document.addEventListener('DOMContentLoaded', () => {
-    // Load saved photos
-    const savedPhotos = localStorage.getItem('photoBoothPhotos');
-    if (savedPhotos) {
-        photoBuffer = JSON.parse(savedPhotos);
-        displayPhotos();
-    }
-    
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadSavedPhotoState();
+    await loadSavedLoveNotes();
+
+    displayPhotos();
     displayLoveNotes();
     displayMoments();
     createConfetti();
