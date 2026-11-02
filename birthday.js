@@ -1,3 +1,7 @@
+// ============= SUPABASE CONFIG =============
+window.SUPABASE_URL = window.SUPABASE_URL || 'https://ncqtqwsdeuexndrsscdd.supabase.co';
+window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_-KRLFA5LqvSfjBKmh8WkZg_-4xrYs8l';
+
 // ============= PAGE NAVIGATION =============
 function navigateTo(page) {
     // Hide all pages
