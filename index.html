@@ -20,7 +20,7 @@
                 </ul>
             </div>
         </nav>
-
+ 
         <!-- Home Page -->
         <section id="home" class="page active">
             <div class="hero">
@@ -74,13 +74,11 @@
                         </div>
                     </div>
 
-                    <!-- Editable Frame Section with Delete Buttons -->
                     <div class="frame-section">
                         <h3>Edit Your Frame</h3>
                         <div id="photoGallery" class="photo-gallery"></div>
                     </div>
 
-                    <!-- Final Frame Section (No Delete Buttons) -->
                     <div class="final-frame-section">
                         <h3>Your Final Photo Booth Frame</h3>
                         <div id="finalFrameGallery" class="photo-gallery final-frame"></div>
@@ -134,6 +132,11 @@
 
     <button id="backBtn" class="back-btn" style="display: none;" onclick="navigateTo('home')">← Back</button>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      window.SUPABASE_URL = 'https://ncqtqwsdeuexndrsscdd.supabase.co';
+      window.SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+    </script>
     <script src="birthday.js"></script>
 </body>
 </html>
